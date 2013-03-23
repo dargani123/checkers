@@ -1,34 +1,24 @@
 class Piece 
 
-	attr_accessor :color, :curr_pos 
+	attr_accessor :color, :curr_pos, :king
 
 	def initialize (board, color, king, position = nil)
 		@board, @color, @curr_pos, @king = board, color, position, king
 	end 
 
-	def possible_moves
-		## set directions
-		## check if opponents in any direction
-		moves = []
-		jump = jump_moves(@curr_pos)
-		moves = (potential_moves - jump).select { |move| @board.at(move).nil? } 
+	def possible_moves(start=@curr_pos)
+		jump = jump_moves(start)
+		moves = (potential_moves(start) - jump).select { |move| @board.at(move).nil? } 
 		moves | jump
-		#moves
 	end 
 
-	def jump_moves (start)
+	def jump_moves (start=@curr_pos)
 		moves = []
-		potential_moves(start).each do |move|
-			path = []
+		potential_moves.each do |move|
 			next if @board.at(move).nil?
 			if @board.at(move).color != color && @board.at(@board.next_in_dir(start, move)).nil? 
-				path += [@board.next_in_dir(start, move)]
-				path << jump_moves(@board.next_in_dir(start, move))
+				moves += [@board.next_in_dir(start, move)]
 			end
-			moves << path
-			puts "#{path} path"
-			puts "sub paths #{sub_paths(path)}"
-			#moves += sub_paths(path) 	
 		end 
 		moves 
 	end 
@@ -49,19 +39,24 @@ class Piece
 	def potential_moves (start=@curr_pos) 
 		pot_moves = []
 		directions.each do |direction|
-			pot_moves << [start[0] + direction, start[1] + 1]
-			pot_moves << [start[0] + direction, start[1] - 1]
+			first, second = [start[0] + direction, start[1] + 1], [start[0] + direction, start[1] - 1]
+			pot_moves << first if @board.in_bounds(first)
+			pot_moves << second if @board.in_bounds(second)
 		end 
 		pot_moves 
 	end 
 
 	def display 
-		letter = (color == :white) ? "w" : "b"
+		letter = (color == :white) ? "w" : "r"
 		@king ? letter.upcase : letter
 	end 
 
-	def change_king 
-		@king = !king
+	def to_king 
+		@king = true
+	end 
+
+	def dup(board)
+		Piece.new(board, color, @king, curr_pos)
 	end 
 
 end 
