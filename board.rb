@@ -19,7 +19,7 @@ class Board
 		[row, col]
 	end 
 
-	def at(position)
+	def at(position) #REV: Smart, I should start doing this.
 		@grid[position[0]][position[1]]
 	end 
 
@@ -40,7 +40,7 @@ class Board
 	end 
 
 	def valid_move?(path, player_color)
-		right_color = at(path[0]).color == player_color
+		right_color = at(path[0]).color == player_color #REV: The next line is too long. Is there a way to combine validPath? and valid_move? methods?
 		legal_move = (at(path[0]).possible_moves.include?(path[1]) && path.length == 2) || (path.length > 2 && validPath?(path)) 
 		right_color && legal_move
 	end 
@@ -51,19 +51,19 @@ class Board
 		set(fin, at(start))
 		set(start, nil)
 
-		at(fin).to_king if at(fin).color == :white && fin[0] == 0 
-		at(fin).to_king if at(fin).color == :black && fin[0] == 7
+		at(fin).to_king if at(fin).color == :white && fin[0] == 0 #REV: I put these two checks in one line since they can't move backwards and your to.king method doesn't require color.
+		at(fin).to_king if at(fin).color == :black && fin[0] == 7 #REV: at(fin).to_king if fin[0] == 0 || fin[0] == 7.
 
-		if (fin[1] - start[1]).abs == 2	
-			row_to_del, col_to_del = (start[0] + fin[0]) / 2, (start[1] + fin[1]) / 2
+		if (fin[1] - start[1]).abs == 2 #REV:Interesting way to check for jumps.
+			row_to_del, col_to_del = (start[0] + fin[0]) / 2, (start[1] + fin[1]) / 2 
 			grid[row_to_del][col_to_del] = nil
 		end 
-	end 
+	end
 
 	def validPath?(path)
 		test_board = self.dup 
 		0.upto(path.size-2) do |i|
-			return false unless test_board.at(path[i]).jump_moves(move).include?(path[i+1]) 
+			return false unless test_board.at(path[i]).jump_moves(move).include?(path[i+1]) #REV: So, jump_moves is not included in possible_moves?
 			test_board.make_move(move, path[i+1])
 		end 
 		return true
@@ -86,7 +86,7 @@ class Board
 	end 
 
 	def make_starting_board
-		[0, 1, 6, 7].each do |row|
+		[0, 1, 6, 7].each do |row| #REV: Need 3 rows of each color!
 			@grid[row].size.times do |i|
 				color = [6,7].include?(row) ? :white : :black 
 				mod_adjust = row.even? ? 0 : 1
@@ -96,14 +96,14 @@ class Board
 	end
 end 
 
-class HumanPlayer
+class HumanPlayer #REV: Probably should have HumanPlayer and Game seperate from board.rb file. Feels odd running board.rb for game to start.
 
 	def initialize (color)
 		@color = color
 	end 
 
 	def play_turn(board)	
-		puts "Enter your move: " 
+		puts "Enter your move: "  #REV: Should probably state who's move it is.
 		path = path_format(gets.chomp)
 		board.move(path, @color) 
 	end 

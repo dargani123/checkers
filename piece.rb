@@ -2,7 +2,7 @@ class Piece
 
 	attr_accessor :color, :curr_pos, :king
 
-	def initialize (board, color, king, position = nil)
+	def initialize (board, color, king, position = nil) #REV: Hm, 
 		@board, @color, @curr_pos, @king = board, color, position, king
 	end 
 
@@ -12,7 +12,7 @@ class Piece
 		moves | jump
 	end 
 
-	def jump_moves (start=@curr_pos)
+	def jump_moves (start=@curr_pos) #REV: What is going on, possible_moves, jump_moves, potential_moves? what.
 		moves = []
 		potential_moves.each do |move|
 			next if @board.at(move).nil?
@@ -47,11 +47,11 @@ class Piece
 	end 
 
 	def display 
-		letter = (color == :white) ? "w" : "r"
+		letter = (color == :white) ? "w" : "r" #REV: What's this? Don't you use * for the piece display?
 		@king ? letter.upcase : letter
 	end 
 
-	def to_king 
+	def to_king #REV: I made King a subclass of Piece with it's own symbol.
 		@king = true
 	end 
 
